@@ -56,7 +56,7 @@ export default function Home() {
             </ul>
           </ProfileRelationsBoxWrapper>
           <Box>
-            Comunidades
+            <h2 className="smallTitle">Comunidades</h2>
           </Box>
         </div>
       </MainGrid >

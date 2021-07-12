@@ -1,4 +1,4 @@
-import React, { HTMLAttributes } from 'react';
+import React, { HTMLAttributes, ReactNode } from 'react';
 import styled, { css } from 'styled-components';
 import NextLink from 'next/link';
 
@@ -7,7 +7,7 @@ const v = '1';
 
 type LinkProps = {
   href: string;
-  children: React.ReactNode;
+  children: ReactNode;
   props?: HTMLAttributes<HTMLAnchorElement>;
 }
 
@@ -106,7 +106,7 @@ AlurakutMenu.Wrapper = styled.header<HeaderProps>`
     }
   }
   .container {
-    background-color: #308BC5;
+    background-color: #2e1503;
     padding: 7px 16px;
     max-width: 1110px;
     margin: auto;
@@ -133,13 +133,13 @@ AlurakutMenu.Wrapper = styled.header<HeaderProps>`
       }
       a {
         font-size: 12px;
-        color: white;
+        color: #fff5e1;
         padding: 10px 16px;
         position: relative;
         text-decoration: none;
         &:after {
           content: " ";
-          background-color: #5292C1;
+          background-color: #9a7b4f;
           display: block;
           position: absolute;
           width: 1px;
@@ -152,14 +152,14 @@ AlurakutMenu.Wrapper = styled.header<HeaderProps>`
       }
     }
     input {
-      color: #ffffff;
-      background: #5579A1;
+      color: #fff5e1;
+      background: #3b3024;
       padding: 10px 42px;
       border: 0;
       background-image: url(${`${BASE_URL}/icons/search.svg`});
       background-position: 15px center;
       background-repeat: no-repeat;
-      border-radius: 1000px;
+      border-radius: 8px;
       font-size: 12px;
       ::placeholder {
         color: #ffffff;
@@ -169,9 +169,10 @@ AlurakutMenu.Wrapper = styled.header<HeaderProps>`
   }
 `;
 AlurakutMenu.Logo = styled.img`
-  background-color: #ffffff;
+  background-color: #090806;
+  margin-right: 16px;
   padding: 9px 14px;
-  border-radius: 1000px;
+  border-radius: 8px;
   height: 34px;
 `;
 
@@ -285,7 +286,7 @@ export function OrkutNostalgicIconSet(props: OrkutNostalgicIconSetProps) {
         { name: 'Legal', slug: 'legal', icon: 'cool' },
         { name: 'Sexy', slug: 'sexy', icon: 'heart' },
       ].map(({ name, slug, icon }) => {
-        const total = props.slug ? props.slug : 2;
+        const total = props.slug ? props.slug : 3;
         return (
           <li key={`orkut__icon_set__${slug}`}>
             <span className="OrkutNostalgicIconSet__title">
@@ -312,7 +313,7 @@ OrkutNostalgicIconSet.List = styled.ul`
   flex-wrap: wrap;
   li {
     font-size: 12px;
-    color: #5A5A5A;
+    color: #090806;
     display: grid;
     grid-template-areas:
       "title title"
