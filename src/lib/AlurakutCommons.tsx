@@ -67,7 +67,7 @@ type HeaderProps = {
 
 AlurakutMenu.Wrapper = styled.header<HeaderProps>`
   width: 100%;
-  background-color: #308BC5;
+  background-color: #2e1503;
   .alurakutMenuProfileSidebar {
     background: white;
     position: fixed;
