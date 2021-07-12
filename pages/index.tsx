@@ -1,10 +1,65 @@
-import styled from 'styled-components'
+import Box from "../src/components/Box";
+import MainGrid from "../src/components/MainGrid";
+import { ProfileRelationsBoxWrapper } from "../src/components/ProfileRelations";
+import { AlurakutMenu, OrkutNostalgicIconSet } from '../src/lib/AlurakutCommons';
 
-const Title = styled.h1`
-  color: red;
-  font-size: 50px;
-`
+type ProfileSideBarProps = {
+  githubUser: string;
+}
+
+function ProfileSideBar(props: ProfileSideBarProps) {
+  return (
+    <Box>
+      <img src={`https://github.com/${props.githubUser}.png`} alt="imagem" style={{ borderRadius: '8px' }} />
+    </Box>
+  )
+}
 
 export default function Home() {
-  return <Title>My page</Title>
+  const githubUser = 'rodolfoHOk';
+  const pessoasFavoritas = [
+    'juunegreiros',
+    'omariosouto',
+    'peas',
+    'rafaballerini',
+    'marcobrunodev',
+    'felipefialho'
+  ]
+
+  return (
+    <>
+      <AlurakutMenu githubUser={githubUser} />
+      <MainGrid>
+        <div className="profileArea" style={{ gridArea: 'profileArea' }}>
+          <ProfileSideBar githubUser={githubUser} />
+        </div>
+        <div className="welcomeArea" style={{ gridArea: 'welcomeArea' }}>
+          <Box>
+            <h1 className="title">Bem-vindo(a)</h1>
+            <OrkutNostalgicIconSet />
+          </Box>
+        </div>
+        <div className="profileRelationsArea" style={{ gridArea: 'profileRelationsArea' }}>
+          <ProfileRelationsBoxWrapper>
+            <h2 className="smallTitle">Pessoas da Comunidade ({pessoasFavoritas.length})</h2>
+            <ul>
+              {pessoasFavoritas.map((pessoa) => {
+                return (
+                  <li key={pessoa}>
+                    <a href={`/users/${pessoa}`} key={pessoa}>
+                      <img src={`https://github.com/${pessoa}.png`} />
+                      <span>{pessoa}</span>
+                    </a>
+                  </li>
+                )
+              })}
+            </ul>
+          </ProfileRelationsBoxWrapper>
+          <Box>
+            Comunidades
+          </Box>
+        </div>
+      </MainGrid >
+    </>
+  )
 }
