@@ -69,7 +69,7 @@ AlurakutMenu.Wrapper = styled.header<HeaderProps>`
   width: 100%;
   background-color: #2e1503;
   .alurakutMenuProfileSidebar {
-    background: white;
+    background: #090803;
     position: fixed;
     z-index: 100;
     padding: 46px;
@@ -240,7 +240,7 @@ export function AlurakutProfileSidebarMenuDefault() {
 AlurakutProfileSidebarMenuDefault.Wrapper = styled.div`
   a {
     font-size: 12px;
-    color: #2E7BB4;
+    color: #ad1457;
     margin-bottom: 16px;
     display: flex;
     align-items: center;
