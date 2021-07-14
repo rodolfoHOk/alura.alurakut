@@ -2,7 +2,7 @@ import React, { FormEvent, useState } from "react";
 import Box from "../src/components/Box";
 import MainGrid from "../src/components/MainGrid";
 import ProfileSideBar from "../src/components/ProfileSideBar";
-import RelationsGroup from "../src/components/RelationsGroup";
+import RelationsGroup from "../src/components/RelationsBox";
 import { AlurakutMenu, OrkutNostalgicIconSet } from '../src/lib/AlurakutCommons';
 
 
@@ -61,7 +61,18 @@ export default function Home() {
     'marcobrunodev',
     'felipefialho',
   ];
+  const [seguindo, setSeguindo] = useState<any[]>([]);
   const [imagemAleatoria, setImagemAleatoria] = useState<string>('');
+
+  React.useEffect(function () {
+    fetch('https://api.github.com/users/rodolfoHOk/following')
+      .then(function (respostaDoServidor) {
+        return respostaDoServidor.json()
+      })
+      .then(function (respostaCompleta) {
+        setSeguindo(respostaCompleta);
+      });
+  }, []);
 
   return (
     <>
@@ -84,7 +95,8 @@ export default function Home() {
               const comunidade: Comunidade = {
                 id: new Date().toISOString(),
                 title: dadosDoForm.get('title')?.toString(),
-                image: dadosDoForm.get('image')?.toString()
+                image: dadosDoForm.get('image')?.toString(),
+                link: dadosDoForm.get('link')?.toString()
               }
               setComunidades([...comunidades, comunidade]);
             }}>
@@ -110,13 +122,22 @@ export default function Home() {
                   Imagem Aleatória
                 </button>
               </div>
+              <div>
+                <input
+                  placeholder="Qual vai ser a url da da sua comunidade?"
+                  name="link"
+                  aria-label="Qual vai ser a url da da sua comunidade?"
+                  type="text"
+                />
+              </div>
               <button type="submit">Criar comunidade</button>
             </form>
           </Box>
         </div>
         <div className="profileRelationsArea" style={{ gridArea: 'profileRelationsArea' }}>
-          <RelationsGroup title="Pessoas" list={pessoasFavoritas} />
+          <RelationsGroup title="Seguindo" list={seguindo} />
           <RelationsGroup title="Comunidades" list={comunidades} />
+          <RelationsGroup title="Pessoas Favoritas" list={pessoasFavoritas} />
         </div >
       </MainGrid >
     </>

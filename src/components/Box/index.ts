@@ -43,7 +43,7 @@ const Box = styled.div`
     border: 0;
     padding: 14px 16px;
     margin-bottom: 14px;
-    border-radius: 10000px;
+    border-radius: 8px;
     ::placeholder {
       color: #333333;
       opacity: 1;
@@ -53,7 +53,7 @@ const Box = styled.div`
     border: 0;
     padding: 8px 12px;
     color: #FFFFFF;
-    border-radius: 10000px;
+    border-radius: 8px;
     background-color: #2e1503;
   }
 `;
