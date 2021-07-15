@@ -15,8 +15,8 @@ export default function RelationsBox(props: RelationsBoxProps) {
             {props.list.slice(0 - 6).map((itemList) => {
               return (
                 <li key={itemList.id}>
-                  <a href={itemList.link}>
-                    <img src={itemList.image} />
+                  <a href={itemList.url}>
+                    <img src={itemList.imageUrl} />
                     <span>{itemList.title}</span>
                   </a>
                 </li >
