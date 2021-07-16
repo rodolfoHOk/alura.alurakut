@@ -1,8 +1,10 @@
+import Link from "next/link";
 import { ProfileRelationsBoxWrapper } from "../ProfileRelations"
 
 type RelationsBoxProps = {
   title: string;
   list: any[];
+  linkUrl: string;
 }
 
 export default function RelationsBox(props: RelationsBoxProps) {
@@ -40,10 +42,10 @@ export default function RelationsBox(props: RelationsBoxProps) {
           <ul>
             {props.list.slice(0 - 6).map((itemList) => {
               return (
-                <li key={itemList}>
-                  <a href={`/ users / ${itemList}`}>
-                    <img src={`https://github.com/${itemList}.png`} />
-                    <span>{itemList}</span>
+                <li key={itemList.id}>
+                  <a href={`/users/${itemList.githubUser}`}>
+                    <img src={`https://github.com/${itemList.githubUser}.png`} />
+                    <span>{itemList.githubUser}</span>
                   </a>
                 </li >
               );
@@ -51,6 +53,10 @@ export default function RelationsBox(props: RelationsBoxProps) {
           </ul>
         )
       }
+      <hr />
+      <Link href={props.linkUrl}>
+        <a className="boxLink">Ver todos</a>
+      </Link>
     </ProfileRelationsBoxWrapper >
   )
 }

@@ -5,28 +5,50 @@ import ProfileSideBar from "../src/components/ProfileSideBar";
 import RelationsGroup from "../src/components/RelationsBox";
 import { AlurakutMenu, OrkutNostalgicIconSet } from '../src/lib/AlurakutCommons';
 
-
 type Comunidade = {
-  id?: string | undefined;
+  id?: string;
   title: string | undefined;
   imageUrl: string | undefined;
-  url?: string | undefined;
-  creatorSlug?: string | undefined;
+  url?: string;
+  creatorSlug?: string;
+}
+
+type Person = {
+  id?: string;
+  githubUser: string;
+}
+
+type Perfil = {
+  id?: string;
+  name: string;
+  gender: string;
+  localization: string;
+  githubUser: string;
+}
+
+type Depoimento = {
+  id?: string;
+  message: string | undefined;
+  user: string | undefined;
+  _createdAt?: Date;
+}
+
+type Scrap = {
+  id?: string;
+  message: string | undefined;
+  user: string | undefined;
+  _createdAt?: Date;
 }
 
 export default function Home() {
   const githubUser = 'rodolfoHOk';
   const [comunidades, setComunidades] = React.useState<Comunidade[]>([]);
-  const pessoasFavoritas = [
-    'guilhermeSilveira',
-    'juunegreiros',
-    'omariosouto',
-    'peas',
-    'rafaballerini',
-    'marcobrunodev',
-    'felipefialho',
-  ];
+  const [pessoasFavoritas, setPessoasFavoritas] = useState<Person[]>([]);
   const [seguindo, setSeguindo] = useState<any[]>([]);
+  const [perfil, setPerfil] = useState<Perfil>();
+  const [showAba, setShowAba] = useState<string>('nenhuma');
+  const [depoimentos, setDepoimentos] = useState<Depoimento[]>([]);
+  const [scraps, setScraps] = useState<Scrap[]>([]);
   const [imagemAleatoria, setImagemAleatoria] = useState<string>('');
 
   React.useEffect(function () {
@@ -39,7 +61,7 @@ export default function Home() {
         setSeguindo(respostaCompleta);
       });
 
-    // API graphQL DatoCMS
+    // API graphQL DatoCMS Comunidades
     const token = process.env.NEXT_PUBLIC_DATO_CMS_READ_TOKEN;
     fetch('https://graphql.datocms.com/', {
       method: 'POST',
@@ -59,22 +81,77 @@ export default function Home() {
           }
         }`
       })
-    })
-      .then((response => response.json())) // pega o retorno do response.json() e já retorna(return)
+    }).then((response => response.json())) // pega o retorno do response.json() e já retorna(return)
       .then((respostaCompleta) => { // precisa usar o return algo diferente do acima
         // console.log(respostaCompleta.data.allCommunities);
         setComunidades(respostaCompleta.data.allCommunities);
       });
+
+    // fetch Pessoas Favoritas API graphQL DatoCMS
+    fetch('https://graphql.datocms.com/', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        'query': `query {
+          allFavoritePeople {
+            id
+            githubUser
+          }
+        }`
+      })
+    }).then(async (response) => {
+      const dados = await response.json();
+      setPessoasFavoritas(dados.data.allFavoritePeople);
+    });
+
+    // fetch perfil API graphQL DatoCMS
+    fetch('https://graphql.datocms.com/', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        'query': `query {
+          perfil {
+            id
+            name
+            gender
+            localization
+            githubUser
+          }
+        }`
+      })
+    }).then(async (response) => {
+      const dados = await response.json();
+      setPerfil(dados.data.perfil);
+    });
+
+    fetch('/api/depoimentos')
+      .then(async (response) => {
+        const dados = await response.json();
+        setDepoimentos(dados);
+      });
+
+    fetch('/api/scraps')
+      .then(async (response) => {
+        const dados = await response.json();
+        setScraps(dados);
+      });
+
   }, []);
-
-
 
   return (
     <>
       <AlurakutMenu githubUser={githubUser} />
       <MainGrid>
         <div className="profileArea" style={{ gridArea: 'profileArea' }}>
-          <ProfileSideBar githubUser={githubUser} />
+          <ProfileSideBar githubUser={githubUser} perfil={perfil} />
         </div>
         <div className="welcomeArea" style={{ gridArea: 'welcomeArea' }}>
           <Box>
@@ -84,69 +161,216 @@ export default function Home() {
 
           <Box>
             <h2 className="subTitle">O que você deseja fazer?</h2>
-            <form onSubmit={function handleCriaComunidade(event: FormEvent<HTMLFormElement>) {
-              event.preventDefault();
-              const dadosDoForm = new FormData(event.target as HTMLFormElement);
-              const comunidade: Comunidade = {
-                title: dadosDoForm.get('title')?.toString(),
-                imageUrl: dadosDoForm.get('imageUrl')?.toString(),
-                url: dadosDoForm.get('url')?.toString(),
-                creatorSlug: "rodolfoHOk",
-              }
+            <div className="buttons">
+              <button
+                onClick={() => setShowAba('Comunidade')}
+              >
+                Criar Comunidade
+              </button>
+              <button
+                onClick={() => setShowAba('Depoimento')}
+              >
+                Escrever depoimento
+              </button>
+              <button
+                onClick={() => setShowAba('Scrap')}
+              >
+                Deixar um scrap
+              </button>
+            </div>
+            {
+              showAba === 'Comunidade' &&
+              <form onSubmit={function handleCriaComunidade(event: FormEvent<HTMLFormElement>) {
+                event.preventDefault();
+                const dadosDoForm = new FormData(event.target as HTMLFormElement);
+                const comunidade: Comunidade = {
+                  title: dadosDoForm.get('title')?.toString(),
+                  imageUrl: dadosDoForm.get('imageUrl')?.toString(),
+                  url: dadosDoForm.get('url')?.toString(),
+                  creatorSlug: "rodolfoHOk",
+                }
 
-              fetch('/api/comunidades', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(comunidade)
-              })
-                .then(async (response) => {
-                  const dados = await response.json();
-                  // console.log(dados);
-                  const comunidadeCriada = dados.registroCriado;
-                  setComunidades([...comunidades, comunidadeCriada]);
-                });
+                fetch('/api/comunidades', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(comunidade)
+                })
+                  .then(async (response) => {
+                    const dados = await response.json();
+                    // console.log(dados);
+                    const comunidadeCriada = dados.registroCriado;
+                    setComunidades([...comunidades, comunidadeCriada]);
+                  });
 
-            }}>
-              <div>
-                <input
-                  placeholder="Qual vai ser o nome da sua comunidade?"
-                  name="title"
-                  aria-label="Qual vai ser o nome da sua comunidade?"
-                  type="text"
-                />
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'row' }}>
-                <input
-                  placeholder="Qual vai ser a url da imagem da sua comunidade?"
-                  name="imageUrl"
-                  aria-label="Qual vai ser a url da imagem da sua comunidade?"
-                  type="text"
-                  defaultValue={imagemAleatoria}
-                />
-                <button style={{ height: '45px' }} type="button" onClick={() => {
-                  setImagemAleatoria('https://picsum.photos/200/300');
-                }}>
-                  Imagem Aleatória
-                </button>
-              </div>
-              <div>
-                <input
-                  placeholder="Qual vai ser a url da da sua comunidade?"
-                  name="url"
-                  aria-label="Qual vai ser a url da da sua comunidade?"
-                  type="text"
-                />
-              </div>
-              <button type="submit">Criar comunidade</button>
-            </form>
+              }}>
+                <div>
+                  <input
+                    placeholder="Qual vai ser o nome da sua comunidade?"
+                    name="title"
+                    aria-label="Qual vai ser o nome da sua comunidade?"
+                    type="text"
+                  />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'row' }}>
+                  <input
+                    placeholder="Qual vai ser a url da imagem da sua comunidade?"
+                    name="imageUrl"
+                    aria-label="Qual vai ser a url da imagem da sua comunidade?"
+                    type="text"
+                    defaultValue={imagemAleatoria}
+                  />
+                  <button style={{ height: '45px' }} type="button" onClick={() => {
+                    setImagemAleatoria('https://picsum.photos/200/300');
+                  }}>
+                    Imagem Aleatória
+                  </button>
+                </div>
+                <div>
+                  <input
+                    placeholder="Qual vai ser a url da da sua comunidade?"
+                    name="url"
+                    aria-label="Qual vai ser a url da da sua comunidade?"
+                    type="text"
+                  />
+                </div>
+                <button type="submit">Criar</button>
+              </form>
+            }
+            {
+              showAba === 'Depoimento' &&
+              <form onSubmit={function handleCriaComunidade(event: FormEvent<HTMLFormElement>) {
+                event.preventDefault();
+                const dadosDoForm = new FormData(event.target as HTMLFormElement);
+                const depoimento: Depoimento = {
+                  message: dadosDoForm.get('message')?.toString(),
+                  user: dadosDoForm.get('githubUser')?.toString(),
+                }
+
+                fetch('/api/depoimentos', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(depoimento)
+                })
+                  .then(async (response) => {
+                    const dados = await response.json();
+                    const depoimentoCriado = dados.registroCriado;
+                    setDepoimentos([...depoimentos, depoimentoCriado]);
+                  });
+
+              }}>
+                <div>
+                  <textarea
+                    placeholder="Depoimento"
+                    name="message"
+                    aria-label="Depoimento"
+                  />
+                </div>
+                <div>
+                  <input
+                    placeholder="Autor (github user)"
+                    name="githubUser"
+                    aria-label="Autor (github user)"
+                    type="text"
+                  />
+                </div>
+                <button type="submit">Enviar</button>
+              </form>
+            }
+            {
+              showAba === 'Scrap' &&
+              <form onSubmit={function handleCriaComunidade(event: FormEvent<HTMLFormElement>) {
+                event.preventDefault();
+                const dadosDoForm = new FormData(event.target as HTMLFormElement);
+                const scrap: Scrap = {
+                  message: dadosDoForm.get('message')?.toString(),
+                  user: dadosDoForm.get('githubUser')?.toString(),
+                }
+
+                fetch('/api/scraps', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(scrap)
+                })
+                  .then(async (response) => {
+                    const dados = await response.json();
+                    const scrapCriada = dados.registroCriado;
+                    setScraps([...scraps, scrapCriada]);
+                  });
+
+              }}>
+                <div>
+                  <textarea
+                    placeholder="Recado"
+                    name="message"
+                    aria-label="Recado"
+                  />
+                </div>
+                <div>
+                  <input
+                    placeholder="Autor (github user)"
+                    name="githubUser"
+                    aria-label="Autor (github user)"
+                    type="text"
+                  />
+                </div>
+                <button type="submit">Enviar</button>
+              </form>
+            }
           </Box>
+
+          {/* Recados */}
+          {
+            scraps.length > 0 &&
+            <Box>
+              <h2 className="subTitle">Scraps</h2>
+              {
+                scraps.map((scrap) => {
+                  return (
+                    <Box className="scrap">
+                      <span>
+                        {scrap.user}:
+                        <img src={`https://github.com/${scrap.user}.png`} />
+                      </span>
+                      <p>{scrap.message}</p>
+                      <span className="date">{new Date(scrap._createdAt!).toLocaleDateString()}</span>
+                    </Box>
+                  );
+                })
+              }
+            </Box>
+          }
+          {/* Depoimentos */}
+          {
+            depoimentos.length > 0 &&
+            <Box>
+              <h2 className="subTitle">Depoimentos</h2>
+              {
+                depoimentos.map((depoimento) => {
+                  return (
+                    <Box className="scrap">
+                      <span>
+                        {depoimento.user}
+                        <img src={`https://github.com/${depoimento.user}.png`} />
+                      </span>
+                      <p>{depoimento.message}</p>
+                      <span className="date">{new Date(depoimento._createdAt!).toLocaleDateString()}</span>
+                    </Box>
+                  );
+                })
+              }
+            </Box>
+          }
         </div>
         <div className="profileRelationsArea" style={{ gridArea: 'profileRelationsArea' }}>
-          <RelationsGroup title="Seguindo" list={seguindo} />
-          <RelationsGroup title="Comunidades" list={comunidades} />
-          <RelationsGroup title="Pessoas Favoritas" list={pessoasFavoritas} />
+          <RelationsGroup title="Seguindo" list={seguindo} linkUrl="/seguindo" />
+          <RelationsGroup title="Comunidades" list={comunidades} linkUrl="/comunidades" />
+          <RelationsGroup title="Pessoas Favoritas" list={pessoasFavoritas} linkUrl="/favoritas" />
         </div >
       </MainGrid >
     </>

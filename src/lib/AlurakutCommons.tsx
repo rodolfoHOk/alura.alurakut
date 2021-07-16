@@ -36,7 +36,7 @@ export function AlurakutMenu({ githubUser }: AlurakutMenuProps) {
         <AlurakutMenu.Logo src={`${BASE_URL}/logo.svg`} />
 
         <nav style={{ flex: 1 }}>
-          {[{ name: 'Inicio', slug: '/' }, { name: 'Amigos', slug: '/amigos' }, { name: 'Comunidades', slug: '/comunidades' }].map((menuItem) => (
+          {[{ name: 'Inicio', slug: '/' }, { name: 'Pessoas Favoritas', slug: '/favoritas' }, { name: 'Comunidades', slug: '/comunidades' }, { name: 'Seguindo', slug: '/seguindo' }].map((menuItem) => (
             <Link key={`key__${menuItem.name.toLocaleLowerCase()}`} href={`${menuItem.slug.toLocaleLowerCase()}`}>
               {menuItem.name}
             </Link>
