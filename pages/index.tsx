@@ -384,24 +384,16 @@ export default function Home(props: HomeProps) {
   )
 }
 
-// type TokenData = {
-//   githubUser: string;
-//   roles: string[];
-//   iat: number;
-//   exp: number;
-// }
-
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const token = nookies.get(context).USER_TOKEN;
 
-  let { isAuthenticated } = await fetch('https://alurakut.vercel.app/api/auth', {
+  // https://alurakut-rodolfohok.vercel.app/api/auth
+  // http://localhost:3000/api/auth
+  const { isAuthenticated } = await fetch('https://alurakut-rodolfohok.vercel.app/api/auth', {
     headers: {
       'Authorization': `Bearer ${token}`
     }
   }).then((response) => response.json());
-
-  // console.log('isAuthenticated', isAuthenticated);
-  // isAuthenticated = true;
 
   if (!isAuthenticated) {
     return {
