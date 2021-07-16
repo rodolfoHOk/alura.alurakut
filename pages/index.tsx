@@ -1,3 +1,6 @@
+import { GetServerSideProps } from "next";
+import nookies from 'nookies';
+import jwt from 'jsonwebtoken';
 import React, { FormEvent, useState } from "react";
 import Box from "../src/components/Box";
 import MainGrid from "../src/components/MainGrid";
@@ -40,8 +43,12 @@ type Scrap = {
   _createdAt?: Date;
 }
 
-export default function Home() {
-  const githubUser = 'rodolfoHOk';
+type HomeProps = {
+  githubUser: string;
+}
+
+export default function Home(props: HomeProps) {
+  const githubUser = props.githubUser;
   const [comunidades, setComunidades] = React.useState<Comunidade[]>([]);
   const [pessoasFavoritas, setPessoasFavoritas] = useState<Person[]>([]);
   const [seguindo, setSeguindo] = useState<any[]>([]);
@@ -332,7 +339,7 @@ export default function Home() {
               {
                 scraps.map((scrap) => {
                   return (
-                    <Box className="scrap">
+                    <Box className="scrap" key={scrap.id}>
                       <span>
                         {scrap.user}:
                         <img src={`https://github.com/${scrap.user}.png`} />
@@ -353,7 +360,7 @@ export default function Home() {
               {
                 depoimentos.map((depoimento) => {
                   return (
-                    <Box className="scrap">
+                    <Box className="scrap" key={depoimento.id}>
                       <span>
                         {depoimento.user}
                         <img src={`https://github.com/${depoimento.user}.png`} />
@@ -375,4 +382,38 @@ export default function Home() {
       </MainGrid >
     </>
   )
+}
+
+// type TokenData = {
+//   githubUser: string;
+//   roles: string[];
+//   iat: number;
+//   exp: number;
+// }
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const token = nookies.get(context).USER_TOKEN;
+
+  let { isAuthenticated } = await fetch('https://alurakut.vercel.app/api/auth', {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  }).then((response) => response.json());
+
+  // console.log('isAuthenticated', isAuthenticated);
+  // isAuthenticated = true;
+
+  if (!isAuthenticated) {
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false
+      }
+    }
+  }
+
+  const { githubUser }: any = jwt.decode(token);
+  return {
+    props: { githubUser },
+  }
 }
