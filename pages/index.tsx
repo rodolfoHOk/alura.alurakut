@@ -140,7 +140,7 @@ export default function Home(props: HomeProps) {
         <div className="welcomeArea" style={{ gridArea: 'welcomeArea' }}>
           <Box>
             <h1 className="title">Bem-vindo(a)</h1>
-            <OrkutNostalgicIconSet />
+            <OrkutNostalgicIconSet scraps={scraps.length + depoimentos.length} />
           </Box>
 
           <Box>

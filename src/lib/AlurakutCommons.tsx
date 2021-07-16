@@ -259,6 +259,7 @@ AlurakutProfileSidebarMenuDefault.Wrapper = styled.div`
 // ======================== ========================================================================================
 type OrkutNostalgicIconSetProps = {
   slug?: number;
+  scraps?: number;
 }
 
 export function OrkutNostalgicIconSet(props: OrkutNostalgicIconSetProps) {
@@ -277,7 +278,13 @@ export function OrkutNostalgicIconSet(props: OrkutNostalgicIconSetProps) {
           </span>
           <span className="OrkutNostalgicIconSet__number" style={{ gridArea: 'number' }}>
             <img key={`orkut__icon_set__${slug}_img`} className="OrkutNostalgicIconSet__iconSample" src={`https://alurakut.vercel.app/icons/${icon}.svg`} />
-            {props.slug ? props.slug : 0}
+            {
+              slug === 'recados' && 'scraps'
+                ? props.scraps
+                : props.slug
+                  ? props.slug
+                  : 0
+            }
           </span>
         </li>
       ))}
@@ -286,7 +293,7 @@ export function OrkutNostalgicIconSet(props: OrkutNostalgicIconSetProps) {
         { name: 'Legal', slug: 'legal', icon: 'cool' },
         { name: 'Sexy', slug: 'sexy', icon: 'heart' },
       ].map(({ name, slug, icon }) => {
-        const total = props.slug ? props.slug : 3;
+        const total = props.slug ? props.slug : 2;
         return (
           <li key={`orkut__icon_set__${slug}`}>
             <span className="OrkutNostalgicIconSet__title">
