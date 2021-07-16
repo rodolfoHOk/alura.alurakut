@@ -21,14 +21,6 @@ type Person = {
   githubUser: string;
 }
 
-type Perfil = {
-  id?: string;
-  name: string;
-  gender: string;
-  localization: string;
-  githubUser: string;
-}
-
 type Depoimento = {
   id?: string;
   message: string | undefined;
@@ -52,15 +44,15 @@ export default function Home(props: HomeProps) {
   const [comunidades, setComunidades] = React.useState<Comunidade[]>([]);
   const [pessoasFavoritas, setPessoasFavoritas] = useState<Person[]>([]);
   const [seguindo, setSeguindo] = useState<any[]>([]);
-  const [perfil, setPerfil] = useState<Perfil>();
+  const [perfil, setPerfil] = useState({});
   const [showAba, setShowAba] = useState<string>('nenhuma');
   const [depoimentos, setDepoimentos] = useState<Depoimento[]>([]);
   const [scraps, setScraps] = useState<Scrap[]>([]);
   const [imagemAleatoria, setImagemAleatoria] = useState<string>('');
 
   React.useEffect(function () {
-    // API github - GET fetch
-    fetch('https://api.github.com/users/rodolfoHOk/following')
+    // API github - fetch seguindo
+    fetch(`https://api.github.com/users/${githubUser}/following`)
       .then(function (respostaDoServidor) {
         return respostaDoServidor.json()
       })
@@ -115,36 +107,21 @@ export default function Home(props: HomeProps) {
       setPessoasFavoritas(dados.data.allFavoritePeople);
     });
 
-    // fetch perfil API graphQL DatoCMS
-    fetch('https://graphql.datocms.com/', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-      },
-      body: JSON.stringify({
-        'query': `query {
-          perfil {
-            id
-            name
-            gender
-            localization
-            githubUser
-          }
-        }`
-      })
-    }).then(async (response) => {
-      const dados = await response.json();
-      setPerfil(dados.data.perfil);
-    });
+    // API github - fetch perfil
+    fetch(`https://api.github.com/users/${githubUser}`)
+      .then(async (response) => {
+        const dados = await response.json();
+        setPerfil(dados);
+      });
 
+    // API Next - fetch depoimentos
     fetch('/api/depoimentos')
       .then(async (response) => {
         const dados = await response.json();
         setDepoimentos(dados);
       });
 
+    // API Next - fetch scraps
     fetch('/api/scraps')
       .then(async (response) => {
         const dados = await response.json();
@@ -387,8 +364,6 @@ export default function Home(props: HomeProps) {
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const token = nookies.get(context).USER_TOKEN;
 
-  // https://alurakut-rodolfohok.vercel.app/api/auth
-  // http://localhost:3000/api/auth
   const { isAuthenticated } = await fetch('https://alurakut-rodolfohok.vercel.app/api/auth', {
     headers: {
       'Authorization': `Bearer ${token}`
