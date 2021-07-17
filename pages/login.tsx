@@ -5,6 +5,7 @@ import nookies from 'nookies';
 export default function Login() {
   const router = useRouter();
   const [githubUser, setGithubUser] = useState<string>('');
+  const [loginError, setLoginError] = useState<string>('');
 
   return (
     <main style={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
@@ -28,13 +29,25 @@ export default function Login() {
               body: JSON.stringify({ githubUser: githubUser })
             }).then(async (response) => {
               const dados = await response.json();
-              nookies.set(null, 'USER_TOKEN', dados.token, {
-                path: '/',
-                maxAge: 86400 * 7
+              // https://alurakut-rodolfohok.vercel.app/api/auth
+              // http://localhost:3000/api/auth
+              fetch('https://alurakut-rodolfohok.vercel.app/api/auth', {
+                headers: {
+                  'Authorization': `Bearer ${dados.token}`
+                }
+              }).then(async (authResponse) => {
+                const authDados = await authResponse.json();
+                if (authDados.isAuthenticated) {
+                  nookies.set(null, 'USER_TOKEN', dados.token, {
+                    path: '/',
+                    maxAge: 86400 * 7
+                  });
+                  router.push('/');
+                } else {
+                  setLoginError(authDados.message);
+                }
               });
-              router.push('/');
             });
-
           }}>
             <p>
               Acesse agora mesmo com seu usuário do <strong>GitHub</strong>!
@@ -46,7 +59,11 @@ export default function Login() {
             />
             {
               githubUser.length === 0 &&
-              <div><p>Preencha o campo usuário</p></div>
+              <p style={{ marginBottom: '8px' }}>Preencha o campo usuário</p>
+            }
+            {
+              loginError &&
+              <p style={{ marginBottom: '8px', color: 'red' }}>{loginError}</p>
             }
             <button type="submit">
               Login

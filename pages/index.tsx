@@ -7,6 +7,7 @@ import MainGrid from "../src/components/MainGrid";
 import ProfileSideBar from "../src/components/ProfileSideBar";
 import RelationsGroup from "../src/components/RelationsBox";
 import { AlurakutMenu, OrkutNostalgicIconSet } from '../src/lib/AlurakutCommons';
+import { useRouter } from "next/router";
 
 type Comunidade = {
   id?: string;
@@ -49,6 +50,7 @@ export default function Home(props: HomeProps) {
   const [depoimentos, setDepoimentos] = useState<Depoimento[]>([]);
   const [scraps, setScraps] = useState<Scrap[]>([]);
   const [imagemAleatoria, setImagemAleatoria] = useState<string>('');
+  const router = useRouter();
 
   React.useEffect(function () {
     // API github - fetch seguindo
@@ -130,9 +132,14 @@ export default function Home(props: HomeProps) {
 
   }, []);
 
+  function logout() {
+    nookies.destroy(null, 'USER_TOKEN');
+    router.push('/login');
+  }
+
   return (
     <>
-      <AlurakutMenu githubUser={githubUser} />
+      <AlurakutMenu githubUser={githubUser} logout={logout} />
       <MainGrid>
         <div className="profileArea" style={{ gridArea: 'profileArea' }}>
           <ProfileSideBar githubUser={githubUser} perfil={perfil} />
@@ -363,6 +370,15 @@ export default function Home(props: HomeProps) {
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const token = nookies.get(context).USER_TOKEN;
+
+  if (!token) {
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false
+      }
+    }
+  }
 
   const { isAuthenticated } = await fetch('https://alurakut-rodolfohok.vercel.app/api/auth', {
     headers: {

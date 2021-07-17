@@ -26,9 +26,10 @@ function Link({ href, children, ...props }: LinkProps) {
 // ================================================================================================================
 type AlurakutMenuProps = {
   githubUser: string;
+  logout: () => void;
 }
 
-export function AlurakutMenu({ githubUser }: AlurakutMenuProps) {
+export function AlurakutMenu({ githubUser, logout }: AlurakutMenuProps) {
   const [isMenuOpen, setMenuState] = React.useState(false);
   return (
     <AlurakutMenu.Wrapper isMenuOpen={isMenuOpen}>
@@ -44,7 +45,7 @@ export function AlurakutMenu({ githubUser }: AlurakutMenuProps) {
         </nav>
 
         <nav>
-          <a href={`/logout`}>
+          <a onClick={logout}>
             Sair
           </a>
           <div>
