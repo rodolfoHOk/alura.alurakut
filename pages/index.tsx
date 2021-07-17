@@ -397,6 +397,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const { githubUser }: any = jwt.decode(token);
   return {
-    props: { githubUser },
+    props: { githubUser }
   }
 }

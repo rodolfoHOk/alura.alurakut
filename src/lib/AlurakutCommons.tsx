@@ -1,6 +1,7 @@
 import React, { HTMLAttributes, ReactNode } from 'react';
 import styled, { css } from 'styled-components';
 import NextLink from 'next/link';
+import { useRouter } from 'next/router';
 
 const BASE_URL = 'http://alurakut.vercel.app/';
 const v = '1';
@@ -204,10 +205,11 @@ function AlurakutMenuProfileSidebar({ githubUser }: AlurakutMenuProfileSidebarPr
 // AlurakutProfileSidebarMenuDefault
 // ================================================================================================================
 export function AlurakutProfileSidebarMenuDefault() {
+  const router = useRouter();
   return (
     <AlurakutProfileSidebarMenuDefault.Wrapper>
       <nav>
-        <a href="/">
+        <a onClick={() => router.push('/perfil')}>
           <img src={`${BASE_URL}/icons/user.svg`} />
           Perfil
         </a>

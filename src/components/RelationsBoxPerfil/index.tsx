@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ProfileRelationsBoxWrapper } from "../ProfileRelations"
+import { ProfileRelationsBoxPerfilWrapper } from "../ProfileRelationsPerfil";
 
 type RelationsBoxProps = {
   title: string;
@@ -7,9 +7,9 @@ type RelationsBoxProps = {
   linkUrl: string;
 }
 
-export default function RelationsBox(props: RelationsBoxProps) {
+export default function RelationsBoxPerfil(props: RelationsBoxProps) {
   return (
-    <ProfileRelationsBoxWrapper>
+    <ProfileRelationsBoxPerfilWrapper>
       <h2 className="smallTitle">{props.title} ({props.list.length})</h2>
       {
         props.title === 'Comunidades' ? (
@@ -70,6 +70,6 @@ export default function RelationsBox(props: RelationsBoxProps) {
       <Link href={props.linkUrl}>
         <a className="boxLink">Ver todos</a>
       </Link>
-    </ProfileRelationsBoxWrapper >
+    </ProfileRelationsBoxPerfilWrapper >
   )
 }

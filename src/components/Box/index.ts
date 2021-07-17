@@ -115,6 +115,39 @@ const Box = styled.div`
     border-radius: 8px;
     background-color: #2e1503;
   }
+
+  .image {
+    img {
+      margin-top: -32px;
+      margin-bottom: 16px;
+      margin-right: auto;
+      margin-left: auto;
+      width: 200px;
+      height: 200;
+      border: 8px solid #fff5e1;
+      border-radius: 1000px;
+    }
+  }
+  table {
+    background-color: #f5f5f5;
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid #fff5e1;
+    border-collapse: collapse;
+    tr {
+      background-color: #dcd0ba;
+      color: #090806;
+      text-align: center;
+    }
+    tr:nth-child(odd) {
+      background-color: #e5c8a8;
+      color: #090806;
+    }
+    td {
+      border: none;
+      padding: 8px;
+    }
+  }
 `;
 
 export default Box;
