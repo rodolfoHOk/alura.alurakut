@@ -2,6 +2,7 @@ import React, { HTMLAttributes, ReactNode } from 'react';
 import styled, { css } from 'styled-components';
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
+import nookies from 'nookies';
 
 const BASE_URL = 'http://alurakut.vercel.app/';
 const v = '1';
@@ -232,7 +233,10 @@ export function AlurakutProfileSidebarMenuDefault() {
           <img src={`${BASE_URL}/icons/plus.svg`} />
           GitHub Trends
         </a>
-        <a href="/logout">
+        <a onClick={() => {
+          nookies.destroy(null, 'USER_TOKEN');
+          router.push('/login');
+        }}>
           <img src={`${BASE_URL}//icons/logout.svg`} />
           Sair
         </a>
