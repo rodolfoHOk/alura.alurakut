@@ -354,10 +354,10 @@ OrkutNostalgicIconSet.List = styled.ul`
 const AlurakutLoginScreen = css`
   :root {
     --backgroundPrimary: #D9E6F6;
-    --backgroundSecondary: #F1F9FE;
-    --backgroundTertiary: #FFFFFF;
-    --backgroundQuarternary: #BBCDE8;
-    --colorPrimary: #2E7BB4;
+    --backgroundSecondary: #af9e95;
+    --backgroundTertiary: #fff5e1;
+    --backgroundQuarternary: #e8bbce;
+    --colorPrimary: #2e1503;
     --colorSecondary: #388BB0;
     --colorTertiary: #2F4A71;
     --colorQuarternary: #D81D99;
