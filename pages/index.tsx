@@ -11,10 +11,10 @@ import { useRouter } from "next/router";
 
 type Comunidade = {
   id?: string;
-  title: string | undefined;
-  imageUrl: string | undefined;
+  title: string;
+  imageUrl: string;
   url?: string;
-  creatorSlug?: string;
+  creatorSlug: string;
 }
 
 type Person = {
@@ -24,15 +24,15 @@ type Person = {
 
 type Depoimento = {
   id?: string;
-  message: string | undefined;
-  user: string | undefined;
+  message: string;
+  user: string;
   _createdAt?: Date;
 }
 
 type Scrap = {
   id?: string;
-  message: string | undefined;
-  user: string | undefined;
+  message: string;
+  user: string;
   _createdAt?: Date;
 }
 
@@ -49,8 +49,23 @@ export default function Home(props: HomeProps) {
   const [showAba, setShowAba] = useState<string>('nenhuma');
   const [depoimentos, setDepoimentos] = useState<Depoimento[]>([]);
   const [scraps, setScraps] = useState<Scrap[]>([]);
-  const [imagemAleatoria, setImagemAleatoria] = useState<string>('');
   const router = useRouter();
+
+  const [novaComunidade, setNovaComunidade] = useState<Comunidade>({
+    title: '',
+    imageUrl: '',
+    url: '',
+    creatorSlug: ''
+  });
+  const [novoDepoimento, setNovoDepoimento] = useState<Depoimento>({
+    message: '',
+    user: '',
+  });
+  const [novoScrap, setNovoScrap] = useState<Scrap>({
+    message: '',
+    user: '',
+  });
+  const [mensagemErro, setMensagemErro] = useState<string>('');
 
   React.useEffect(function () {
     // API github - fetch seguindo
@@ -154,17 +169,26 @@ export default function Home(props: HomeProps) {
             <h2 className="subTitle">O que você deseja fazer?</h2>
             <div className="buttons">
               <button
-                onClick={() => setShowAba('Comunidade')}
+                onClick={() => {
+                  setShowAba('Comunidade');
+                  setMensagemErro('');
+                }}
               >
                 Criar Comunidade
               </button>
               <button
-                onClick={() => setShowAba('Depoimento')}
+                onClick={() => {
+                  setShowAba('Depoimento');
+                  setMensagemErro('');
+                }}
               >
                 Escrever depoimento
               </button>
               <button
-                onClick={() => setShowAba('Scrap')}
+                onClick={() => {
+                  setShowAba('Scrap');
+                  setMensagemErro('');
+                }}
               >
                 Deixar um scrap
               </button>
@@ -173,28 +197,31 @@ export default function Home(props: HomeProps) {
               showAba === 'Comunidade' &&
               <form onSubmit={function handleCriaComunidade(event: FormEvent<HTMLFormElement>) {
                 event.preventDefault();
-                const dadosDoForm = new FormData(event.target as HTMLFormElement);
-                const comunidade: Comunidade = {
-                  title: dadosDoForm.get('title')?.toString(),
-                  imageUrl: dadosDoForm.get('imageUrl')?.toString(),
-                  url: dadosDoForm.get('url')?.toString(),
-                  creatorSlug: "rodolfoHOk",
+
+                let erroValidacao: boolean = false;
+                setMensagemErro('');
+                if (novaComunidade.title.length === 0) {
+                  setMensagemErro('Preencha o nome da comunidade');
+                  erroValidacao = true;
+                }
+                if (novaComunidade.imageUrl.length === 0) {
+                  setMensagemErro('Preencha a url da imagem da comunidade ou clique no botão imagem aleatória');
+                  erroValidacao = true;
                 }
 
-                fetch('/api/comunidades', {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json'
-                  },
-                  body: JSON.stringify(comunidade)
-                })
-                  .then(async (response) => {
+                if (!erroValidacao) {
+                  fetch('/api/comunidades', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(novaComunidade)
+                  }).then(async (response) => {
                     const dados = await response.json();
-                    // console.log(dados);
                     const comunidadeCriada = dados.registroCriado;
                     setComunidades([...comunidades, comunidadeCriada]);
                   });
-
+                }
               }}>
                 <div>
                   <input
@@ -202,6 +229,8 @@ export default function Home(props: HomeProps) {
                     name="title"
                     aria-label="Qual vai ser o nome da sua comunidade?"
                     type="text"
+                    value={novaComunidade.title}
+                    onChange={(e) => setNovaComunidade({ ...novaComunidade, title: e.target.value, creatorSlug: githubUser })}
                   />
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'row' }}>
@@ -210,10 +239,11 @@ export default function Home(props: HomeProps) {
                     name="imageUrl"
                     aria-label="Qual vai ser a url da imagem da sua comunidade?"
                     type="text"
-                    defaultValue={imagemAleatoria}
+                    value={novaComunidade.imageUrl}
+                    onChange={(e) => setNovaComunidade({ ...novaComunidade, imageUrl: e.target.value })}
                   />
                   <button style={{ height: '45px' }} type="button" onClick={() => {
-                    setImagemAleatoria('https://picsum.photos/200/300');
+                    setNovaComunidade({ ...novaComunidade, imageUrl: 'https://picsum.photos/200/300' });
                   }}>
                     Imagem Aleatória
                   </button>
@@ -224,33 +254,50 @@ export default function Home(props: HomeProps) {
                     name="url"
                     aria-label="Qual vai ser a url da da sua comunidade?"
                     type="text"
+                    value={novaComunidade.url}
+                    onChange={(e) => setNovaComunidade({ ...novaComunidade, url: e.target.value })}
                   />
                 </div>
+                {
+                  mensagemErro.length !== 0 &&
+                  <div style={{ paddingBottom: '8px' }}>
+                    <span style={{
+                      color: 'red',
+                      fontSize: '12px',
+                    }}>
+                      {mensagemErro}</span>
+                  </div>
+                }
                 <button type="submit">Criar</button>
               </form>
             }
             {
               showAba === 'Depoimento' &&
-              <form onSubmit={function handleCriaComunidade(event: FormEvent<HTMLFormElement>) {
+              <form onSubmit={async function handleCriaComunidade(event: FormEvent<HTMLFormElement>) {
                 event.preventDefault();
-                const dadosDoForm = new FormData(event.target as HTMLFormElement);
-                const depoimento: Depoimento = {
-                  message: dadosDoForm.get('message')?.toString(),
-                  user: dadosDoForm.get('githubUser')?.toString(),
+
+                let erroValidacao: boolean = false;
+                setMensagemErro('');
+
+                if (novoDepoimento.message.length === 0) {
+                  setMensagemErro('Preencha o campo depoimento');
+                  erroValidacao = true;
                 }
 
-                fetch('/api/depoimentos', {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json'
-                  },
-                  body: JSON.stringify(depoimento)
-                })
-                  .then(async (response) => {
+                if (!erroValidacao) {
+                  setNovoDepoimento({ ...novoDepoimento, user: githubUser });
+                  fetch('/api/depoimentos', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(novoDepoimento)
+                  }).then(async (response) => {
                     const dados = await response.json();
                     const depoimentoCriado = dados.registroCriado;
                     setDepoimentos([...depoimentos, depoimentoCriado]);
                   });
+                }
 
               }}>
                 <div>
@@ -258,16 +305,20 @@ export default function Home(props: HomeProps) {
                     placeholder="Depoimento"
                     name="message"
                     aria-label="Depoimento"
+                    value={novoDepoimento.message}
+                    onChange={(e) => setNovoDepoimento({ ...novoDepoimento, message: e.target.value, user: githubUser })}
                   />
                 </div>
-                <div>
-                  <input
-                    placeholder="Autor (github user)"
-                    name="githubUser"
-                    aria-label="Autor (github user)"
-                    type="text"
-                  />
-                </div>
+                {
+                  mensagemErro.length !== 0 &&
+                  <div style={{ paddingBottom: '8px' }}>
+                    <span style={{
+                      color: 'red',
+                      fontSize: '12px',
+                    }}>
+                      {mensagemErro}</span>
+                  </div>
+                }
                 <button type="submit">Enviar</button>
               </form>
             }
@@ -275,41 +326,48 @@ export default function Home(props: HomeProps) {
               showAba === 'Scrap' &&
               <form onSubmit={function handleCriaComunidade(event: FormEvent<HTMLFormElement>) {
                 event.preventDefault();
-                const dadosDoForm = new FormData(event.target as HTMLFormElement);
-                const scrap: Scrap = {
-                  message: dadosDoForm.get('message')?.toString(),
-                  user: dadosDoForm.get('githubUser')?.toString(),
+
+                let erroValidacao: boolean = false;
+                setMensagemErro('');
+
+                if (novoScrap.message.length === 0) {
+                  setMensagemErro('Preencha o campo de recado');
+                  erroValidacao = true;
                 }
 
-                fetch('/api/scraps', {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json'
-                  },
-                  body: JSON.stringify(scrap)
-                })
-                  .then(async (response) => {
+                if (!erroValidacao) {
+                  fetch('/api/scraps', {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(novoScrap)
+                  }).then(async (response) => {
                     const dados = await response.json();
                     const scrapCriada = dados.registroCriado;
                     setScraps([...scraps, scrapCriada]);
                   });
-
+                }
               }}>
                 <div>
                   <textarea
                     placeholder="Recado"
                     name="message"
                     aria-label="Recado"
+                    value={novoScrap.message}
+                    onChange={(e) => setNovoScrap({ ...novoScrap, message: e.target.value, user: githubUser })}
                   />
                 </div>
-                <div>
-                  <input
-                    placeholder="Autor (github user)"
-                    name="githubUser"
-                    aria-label="Autor (github user)"
-                    type="text"
-                  />
-                </div>
+                {
+                  mensagemErro.length !== 0 &&
+                  <div style={{ paddingBottom: '8px' }}>
+                    <span style={{
+                      color: 'red',
+                      fontSize: '12px',
+                    }}>
+                      {mensagemErro}</span>
+                  </div>
+                }
                 <button type="submit">Enviar</button>
               </form>
             }
